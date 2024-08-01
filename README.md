@@ -44,19 +44,21 @@ The solver is based on the following set of equations:
 
 1. Relation between drift velocity, ion velocity, and ion density:
 
-   ![equation](https://latex.codecogs.com/gif.latex?v_d%20-%20u%20%3D%20%5Cfrac%7Bv_d%7D%7Bn%7D)
+v_d - u = v_d / n
 
 2. Electric potential in terms of velocities:
 
-   ![equation](https://latex.codecogs.com/gif.latex?%5Cphi%20%3D%20uv_d%20-%20%5Cfrac%7Bu%5E2%7D%7B2%7D)
+φ = uv_d - u^2 / 2
 
 3. Nonlinear Poisson equation:
 
-   ![equation](https://latex.codecogs.com/gif.latex?%5Cfrac%7B%5Cpartial%5E2%5Cphi%7D%7B%5Cpartial%5Czeta%5E2%7D%20%3D%20e%5E%5Cphi%20-%20n)
+∂^2φ / ∂ζ^2 = e^φ - n
 
 4. Integrated form (in the absence of source term):
 
-   ![equation](https://latex.codecogs.com/gif.latex?%5Cfrac%7B1%7D%7B2%7D%5Cleft%28%5Cfrac%7B%5Cpartial%5Cphi%7D%7B%5Cpartial%5Czeta%7D%5Cright%29%5E2%20-%20e%5E%5Cphi%20-%20v_d%5Csqrt%7Bv_d%5E2%20-%202%5Cphi%7D%20&plus;%20C%20%3D%200)
+(1/2) * (∂φ/∂ζ)^2 - e^φ - v_d * √(v_d^2 - 2φ) + C = 0
+
+with C = (1 + v_d^2)
 
 These equations are transformed and solved to obtain the electric potential profile of the ion acoustic soliton.
 
