@@ -5,9 +5,15 @@ from scipy import optimize
 
 def sagdeev_ode_solver(phi0, v_d): #this function solves the nonlinear normalized Poisson equation for electric potential. This follows the Sagdeev method
     C = 1 + v_d**2
+    if (v_d**2 - 2*phi0) < 0:
+        raise ValueError("Error: Taking the squqare root of a negative number. Check if v_d was calculated outside of its range")
 
     def odefun(zeta, phi):
-        return -np.sqrt(2 * (np.exp(phi) + v_d * np.sqrt(v_d**2 - 2*phi) - C))
+        arg = 2 * (np.exp(phi) + v_d * np.sqrt(v_d**2 - 2*phi) - C)
+        if arg <= 0:
+            arg = 1e-5 # This epsilon is to ensure a small perturbation for where the derivative equals 0 or if argument is negative due to rounding errors
+
+        return -np.sqrt(arg)
 
     zeta_span = [0, 20]
     sol = solve_ivp(odefun, zeta_span, [phi0], dense_output=True, 
@@ -21,38 +27,16 @@ def sagdeev_ode_solver(phi0, v_d): #this function solves the nonlinear normalize
 
     return zeta_mirrored, phi_mirrored
 
-def solve_for_vd_func(phi, initial_vd_guess):
-    # Check if initial_guess^2 < 2*phi
-    if initial_vd_guess**2 < 2*phi:
-        print(f"Error: initial_guess^2 ({initial_vd_guess**2:.4f}) is less than 2*phi ({2*phi:.4f})")
-        print("This violates the condition vd^2 >= 2*phi. Stopping the program.")
-        sys.exit(1)  # Exit the program with an error code
-    
-    # Define the function
-    def f(vd):
-        return np.exp(phi) + vd * np.sqrt(vd**2 - 2*phi) - (1 + vd**2)
-
-    # Use scipy.optimize.root_scalar to find the root 
-    result = optimize.root_scalar(f, x0=initial_vd_guess, method='secant')
-    vd = result.root
-
-    # Display the result
-    print(f'For phi = {phi:.4f}, v_d = {vd:.4f}')
-
-    # Verify the solution
-    lhs = np.exp(phi) + vd * np.sqrt(vd**2 - 2*phi)
-    rhs = 1 + vd**2
-    print(f'Verification: LHS = {lhs:.6f}, RHS = {rhs:.6f}')
-
-    # Round vd to 4 decimal places and return. This rounding is to ensure a small perturbation 
-    return round(vd, 4)
+def solve_for_vd_func(phi):
+    v_d = np.sqrt((np.exp(phi) - 1)**2 / (2 * (np.exp(phi) - 1 - phi)))
+    return v_d 
 
 def solve_for_u(phi, v_d): #this function is the analytical solution to u if phi is given in the soliton frame. Note we are using the -sqrt() solution 
     phi_array = np.array(phi)
     
     # Check for valid input
     if np.any(v_d**2 < 2*phi_array):
-        raise ValueError("Invalid input: v_d^2 must be greater than or equal to 2*phi for all phi values")
+        raise ValueError("Error: Taking the squqare root of a negative number. Check if v_d was calculated outside of its range")
     
     u = v_d - np.sqrt(v_d**2 - 2*phi_array)
     return u
@@ -63,9 +47,9 @@ def solve_for_n(u, v_d): #this gives the normalized ion density with the ion bul
     return n
 
 # Main script
-phi0 = 0.52
-vd_guess = 1.2
-v_d = solve_for_vd_func(phi0, vd_guess)
+phi0 = 0.9
+v_d = solve_for_vd_func(phi0)
+print(v_d)
 zeta, phi = sagdeev_ode_solver(phi0, v_d)
 u = solve_for_u(phi, v_d)
 n = solve_for_n(u, v_d)
@@ -80,7 +64,7 @@ plt.plot(zeta, u, label= 'Velocity')
 plt.plot(zeta, n - 1, label = 'Ion Density')
 plt.xlabel(r'$\zeta$')
 plt.ylabel(r'$\phi$')
-plt.title('Solution of the ODE')
+plt.title('Solution of the full set of nonlinear fluid equations')
 plt.grid(True)
 plt.legend()
 plt.show()

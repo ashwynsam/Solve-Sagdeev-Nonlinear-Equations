@@ -34,7 +34,7 @@ python sagdeev_nonlinear_solve.py
 ## Key Functions
 
 - `sagdeev_ode_solver(phi0, v_d)`: Solves the ODE for the electric potential
-- `solve_for_vd_func(phi, initial_vd_guess)`: Calculates the soliton Mach number
+- `solve_for_vd_func(phi)`: Calculates the soliton Mach number
 - `solve_for_u(phi, v_d)`: Computes the ion bulk velocity
 - `solve_for_n(u, v_d)`: Calculates the normalized ion density
 
